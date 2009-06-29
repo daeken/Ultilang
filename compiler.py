@@ -14,7 +14,6 @@ class Compiler(object):
 	def compile(self, code):
 		code = Parser().parse(code)
 		for macros in macro.stages:
-			print macros
 			code = self.run(macros, code)
 		return code
 	
@@ -37,5 +36,5 @@ class Compiler(object):
 			return node
 
 if __name__=='__main__':
-	import sys
-	print Compiler().compile(file(sys.argv[1]).read())
+	import pprint, sys
+	pprint.pprint(Compiler().compile(file(sys.argv[1]).read()))

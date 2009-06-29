@@ -1,4 +1,4 @@
-import pprint, re
+import re
 
 class BuildTokenizer(type):
 	def __new__(cls, name, bases, body):
@@ -48,6 +48,7 @@ class UltiTokenizer(Tokenizer):
 	comment = r'#(.*)$'
 	name = r'([a-zA-Z_][a-zA-Z0-9_]*)'
 	newline = r'[\r\n]+'
+	suppressedNewline = r'\\\n'
 	semicolon = r';'
 	comma = r','
 	op = r'([~!$%\^&*-+=./?:<>]+)'
@@ -64,9 +65,14 @@ class Parser(object):
 		self.cur = []
 		self.stack = []
 		self.push('stmt')
+		self.semi = None
 		for name, args in UltiTokenizer().tokenize(code):
 			handler = getattr(self, name)
 			handler(*args)
+			if self.semi == True:
+				self.semi = False
+			elif self.semi == False:
+				self.semi = None
 		return self.toTuple(self.stack[0])
 	
 	def toTuple(self, data):
@@ -97,11 +103,17 @@ class Parser(object):
 		self.cur.append(('name', name))
 	
 	def newline(self, _):
+		if self.semi == None:
+			self.pop('stmt')
+			self.push('stmt')
+	
+	def suppressedNewline(self, _):
 		pass
 	
 	def semicolon(self, _):
 		self.pop('stmt')
 		self.push('stmt')
+		self.semi = True
 	
 	def comma(self, _):
 		self.pop('expr')
@@ -146,5 +158,5 @@ class Parser(object):
 		self.pop('expr')
 
 if __name__=='__main__':
-	import sys
+	import pprint, sys
 	pprint.pprint(Parser().parse(file(sys.argv[1]).read()))
