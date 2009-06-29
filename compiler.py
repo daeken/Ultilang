@@ -2,7 +2,7 @@ from parse import Parser
 
 import macro
 import coremacros
-#import Backend.Python
+import python
 
 def isiterable(obj):
 	if isinstance(obj, tuple) or isinstance(obj, list):

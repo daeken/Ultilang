@@ -30,16 +30,16 @@ class Macro(object):
 	def __transform__(self, node):
 		return self.transform(node)
 
-class StmtMacro(Macro):
+class SyntaxMacro(Macro):
 	__dont_touch__ = True
 	
 	def matches(self, node):
-		if node[0] != 'stmt' or len(self.syntax) != len(node)-1:
+		if len(self.syntax) != len(node):
 			return False
 		
 		for i in xrange(len(self.syntax)):
 			elem = self.syntax[i]
-			if elem != None and node[i+1] != elem:
+			if elem != None and node[i] != elem:
 				return False
 		return True
 	
@@ -48,8 +48,19 @@ class StmtMacro(Macro):
 		for i in xrange(len(self.syntax)):
 			elem = self.syntax[i]
 			if elem == None:
-				args.append(node[i+1])
+				args.append(node[i])
 		return self.transform(*args)
+
+class StmtMacro(SyntaxMacro):
+	__dont_touch__ = True
+	
+	def matches(self, node):
+		if node[0] != 'stmt':
+			return False
+		return SyntaxMacro.matches(self, node[1:])
+	
+	def __transform__(self, node):
+		return SyntaxMacro.__transform__(self, node[1:])
 
 class ExprMacro(Macro):
 	__dont_touch__ = True
