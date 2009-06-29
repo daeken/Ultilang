@@ -2,7 +2,8 @@ import pprint, re
 
 class BuildTokenizer(type):
 	def __new__(cls, name, bases, body):
-		if name == '__Tokenizer__':
+		if '__dont_touch__' in body:
+			del body['__dont_touch__']
 			return type.__new__(cls, name, bases, body)
 		body = {
 				'__module__' : body['__module__'], 
@@ -17,8 +18,9 @@ class BuildTokenizer(type):
 		else:
 			return value
 
-class __Tokenizer__(object):
+class Tokenizer(object):
 	__metaclass__ = BuildTokenizer
+	__dont_touch__ = True
 	ws = re.compile('[ \t]+')
 	def tokenize(self, code):
 		while len(code):
@@ -41,7 +43,6 @@ class __Tokenizer__(object):
 			if not found:
 				print 'Could not tokenize'
 				break
-Tokenizer = __Tokenizer__
 
 class UltiTokenizer(Tokenizer):
 	comment = r'#(.*)$'
@@ -49,7 +50,7 @@ class UltiTokenizer(Tokenizer):
 	newline = r'[\r\n]+'
 	semicolon = r';'
 	comma = r','
-	op = r'([~!#$%\^&*-+=./?:<>]+)'
+	op = r'([~!$%\^&*-+=./?:<>]+)'
 	number = r'(0x[0-9a-fA-F]+|0o[0-7]+|[0-9]+\.[0-9]+|[0-9]+)([fFdDlL]*)'
 	openParen = r'\('
 	closeParen = r'\)'
