@@ -26,7 +26,7 @@ class Compiler(object):
 			done = True
 			for macro in macros:
 				if macro.matches(node):
-					node = macro.transform(node)
+					node = macro.__transform__(node)
 					done = False
 					break
 		

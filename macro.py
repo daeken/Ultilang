@@ -26,12 +26,15 @@ Var = None
 class Macro(object):
 	__metaclass__ = MetaMacro
 	__dont_touch__ = True
+	
+	def __transform__(self, node):
+		return self.transform(node)
 
 class StmtMacro(Macro):
 	__dont_touch__ = True
 	
 	def matches(self, node):
-		if node[0] != 'stmt' or len(self.syntax) > len(node)-1:
+		if node[0] != 'stmt' or len(self.syntax) != len(node)-1:
 			return False
 		
 		for i in xrange(len(self.syntax)):
@@ -40,10 +43,37 @@ class StmtMacro(Macro):
 				return False
 		return True
 	
-	def transform(self, node):
+	def __transform__(self, node):
 		args = []
 		for i in xrange(len(self.syntax)):
 			elem = self.syntax[i]
 			if elem == None:
 				args.append(node[i+1])
-		return self.stmt(*args)
+		return self.transform(*args)
+
+class ExprMacro(Macro):
+	__dont_touch__ = True
+	
+	def matches(self, node):
+		if len(self.syntax) > len(node)-1:
+			return False
+		
+		for i in xrange(len(node)-len(self.syntax)):
+			match = True
+			for j in xrange(len(self.syntax)):
+				elem = self.syntax[j]
+				if elem != None and node[1+i+j] != elem:
+					match = False
+					break
+			if match:
+				self.pos = i
+				return True
+		return False
+	
+	def __transform__(self, node):
+		args = []
+		for i in xrange(len(self.syntax)):
+			elem = self.syntax[i]
+			if elem == None:
+				args.append(node[self.pos+i+1])
+		return tuple(node[:self.pos+1] + (self.transform(*args), ) + node[self.pos+len(self.syntax)+1:])
