@@ -73,7 +73,10 @@ class Parser(object):
 				self.semi = False
 			elif self.semi == False:
 				self.semi = None
-		return self.toTuple(self.stack[0])
+		
+		while len(self.stack):
+			self.pop(None)
+		return self.toTuple(self.cur)
 	
 	def toTuple(self, data):
 		if isinstance(data, list):
@@ -88,7 +91,8 @@ class Parser(object):
 		self.cur = new
 	
 	def pop(self, type):
-		if self.cur[0] == type:
+		if type == None or self.cur[0] == type:
+			type = self.cur[0]
 			self.cur = self.stack.pop()
 			if type in ('expr', 'stmt') and len(self.cur[-1]) == 1:
 				del self.cur[-1]
