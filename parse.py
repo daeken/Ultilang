@@ -62,7 +62,7 @@ class UltiTokenizer(Tokenizer):
 
 class Parser(object):
 	def parse(self, code):
-		self.cur = []
+		self.cur = ['block']
 		self.stack = []
 		self.push('stmt')
 		self.semi = None

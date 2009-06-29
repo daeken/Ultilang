@@ -22,6 +22,28 @@ class MetaMacro(type):
 		stages.add(body['stage'], macro)
 		return macro
 
+Var = None
 class Macro(object):
 	__metaclass__ = MetaMacro
 	__dont_touch__ = True
+
+class StmtMacro(Macro):
+	__dont_touch__ = True
+	
+	def matches(self, node):
+		if node[0] != 'stmt' or len(self.syntax) > len(node)-1:
+			return False
+		
+		for i in xrange(len(self.syntax)):
+			elem = self.syntax[i]
+			if elem != None and node[i+1] != elem:
+				return False
+		return True
+	
+	def transform(self, node):
+		args = []
+		for i in xrange(len(self.syntax)):
+			elem = self.syntax[i]
+			if elem == None:
+				args.append(node[i+1])
+		return self.stmt(*args)

@@ -1,7 +1,7 @@
 from parse import Parser
 
 import macro
-#import coreMacros
+import coremacros
 #import Backend.Python
 
 def isiterable(obj):
@@ -30,8 +30,8 @@ class Compiler(object):
 					done = False
 					break
 		
-		if isiterable(node):
-			return map(lambda node: self.run(macros, node), node)
+		if isiterable(node) and len(node) > 1:
+			return tuple([node[0]] + map(lambda node: self.run(macros, node), node[1:]))
 		else:
 			return node
 
