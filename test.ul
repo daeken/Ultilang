@@ -1,0 +1,11 @@
+# Types are inferred to be: fib : int * int -> yields int
+def fib(a = 0, b = 0) {
+	when(b == 0) {
+		yield 1;
+		return fib(0, 1)
+	}
+	yield a+b;
+	fib(b, a+b) # Implicit return
+}
+
+print fib()
