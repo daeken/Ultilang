@@ -1,16 +1,12 @@
-# Types are inferred to be: fib : int * int -> yields int
 def fib(a = 0, b = 0) {
-	when(a == 13) {
-		return
-	}
 	when(b == 0) {
 		print 1
-		#yield 1
 		return fib(0, 1)
 	}
 	print a+b
-	#yield a+b
-	fib(b, a+b) # Implicit return
+	unless(a == 13) {
+		fib(b, a+b)
+	}
 }
 
 fib()

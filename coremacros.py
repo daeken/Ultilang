@@ -14,6 +14,13 @@ class When(StmtMacro):
 	def transform(self, cond, block):
 		return ('when', cond, block)
 
+class Unless(StmtMacro):
+	stage = 100
+	syntax = ('name', 'unless'), Var, Var
+	
+	def transform(self, cond, block):
+		return ('when', ('not', cond), block)
+
 class Call(Macro):
 	stage = 150
 	

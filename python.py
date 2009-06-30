@@ -38,6 +38,13 @@ class Add(SyntaxMacro):
 	def transform(self, left, right):
 		return ('Add', ('tuple', left, right))
 
+class Not(SyntaxMacro):
+	stage = 1200
+	syntax = 'not', Var
+	
+	def transform(self, value):
+		return ('Not', value)
+
 class Name(SyntaxMacro):
 	stage = 1100
 	syntax = 'name', Var
