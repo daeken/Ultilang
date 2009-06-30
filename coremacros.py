@@ -67,10 +67,10 @@ class ReturnNone(StmtMacro):
 
 class Return(StmtMacro):
 	stage = 400
-	syntax = ('name', 'return')
+	syntax = ('name', 'return'), Var
 	
 	def transform(self, value):
-		return ('return', None)
+		return ('return', value)
 
 class Print(StmtMacro):
 	stage = 400
