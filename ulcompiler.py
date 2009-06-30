@@ -36,5 +36,10 @@ class Compiler(object):
 			return node
 
 if __name__=='__main__':
+	import compiler
 	import pprint, sys
-	pprint.pprint(Compiler().compile(file(sys.argv[1]).read()))
+	code = Compiler().compile(file(sys.argv[1]).read())
+	if len(sys.argv) > 2 and sys.argv[2] == '-v':
+		pprint.pprint(code)
+	compiler.misc.set_filename('<ultilang>', code)
+	eval(compiler.pycodegen.ExpressionCodeGenerator(code).getCode())

@@ -58,12 +58,19 @@ class Yield(StmtMacro):
 	def transform(self, value):
 		return ('yield', value)
 
+class ReturnNone(StmtMacro):
+	stage = 400
+	syntax = ('name', 'return'), 
+	
+	def transform(self):
+		return ('return', None)
+
 class Return(StmtMacro):
 	stage = 400
-	syntax = ('name', 'return'), Var
+	syntax = ('name', 'return')
 	
 	def transform(self, value):
-		return ('return', value)
+		return ('return', None)
 
 class Print(StmtMacro):
 	stage = 400

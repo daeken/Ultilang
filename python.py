@@ -1,4 +1,5 @@
 from macro import Macro, SyntaxMacro, Var
+import compiler.ast
 
 class Def(SyntaxMacro):
 	stage = 1000
@@ -19,7 +20,7 @@ class Def(SyntaxMacro):
 				('str', name[1]), 
 				('tuple', ) + tuple(('str', arg) for arg in argnames), 
 				('tuple', ) + tuple(defaults), 
-				None, None, 
+				('const', 0), None, 
 				block
 			)
 
@@ -28,7 +29,7 @@ class Print(SyntaxMacro):
 	syntax = 'print', Var
 	
 	def transform(self, value):
-		return ('Printnl', ('tuple', value))
+		return ('Printnl', ('tuple', value), None)
 
 class Add(SyntaxMacro):
 	stage = 1000
@@ -62,7 +63,10 @@ class Return(SyntaxMacro):
 	syntax = 'return', Var
 	
 	def transform(self, value):
-		return ('Return', value)
+		if value == None:
+			return ('Return', ('Const', None))
+		else:
+			return ('Return', value)
 
 class When(SyntaxMacro):
 	stage = 1250
@@ -90,3 +94,33 @@ class Block(Macro):
 	
 	def transform(self, node):
 		return ('Stmt', ('tuple', ) + node[1:])
+
+class BuildAST(Macro):
+	stage = 1999
+	
+	def matches(self, node):
+		self.first = True
+		return True
+	
+	def transform(self, node):
+		first = self.first
+		self.first = False
+		
+		if node == None:
+			return None
+		elif isinstance(node, int):
+			return compiler.ast.Const(node)
+		elif node[0] == 'str':
+			return node[1]
+		elif node[0] == 'const':
+			return node[1]
+		elif node[0] == 'tuple':
+			return map(self.transform, node[1:])
+		
+		func = getattr(compiler.ast, node[0])
+		code = func(*map(self.transform, node[1:]))
+		
+		if first:
+			return compiler.ast.Module(None, code)
+		else:
+			return code
